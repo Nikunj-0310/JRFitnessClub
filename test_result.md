@@ -285,14 +285,16 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Authentication System"
-    - "User Management CRUD"
-    - "Fee Collection System"
     - "Splash Screen"
     - "Authentication UI"
     - "Dashboard Screen"
+    - "User Management UI"
+    - "Add User Form"
+    - "Fee Collection UI"
+    - "User Detail View"
+    - "Navigation System"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
