@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,9 +6,10 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
+from collections import defaultdict
 
 
 ROOT_DIR = Path(__file__).parent
@@ -36,6 +37,50 @@ class StatusCheck(BaseModel):
 
 class StatusCheckCreate(BaseModel):
     client_name: str
+
+# Member Models
+class Member(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    phone: str
+    membership_type: str  # e.g., "Basic", "Premium"
+    monthly_fee: float
+    joining_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class MemberCreate(BaseModel):
+    name: str
+    phone: str
+    membership_type: str
+    monthly_fee: float
+
+# Payment Models
+class Payment(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    member_id: str
+    member_name: str
+    amount: float
+    payment_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    payment_type: str  # "monthly", "quarterly", "yearly"
+    notes: Optional[str] = None
+
+class PaymentCreate(BaseModel):
+    member_id: str
+    amount: float
+    payment_date: Optional[datetime] = None
+    payment_type: str = "monthly"
+    notes: Optional[str] = None
+
+# Fee Summary Model
+class FeeSummary(BaseModel):
+    monthly_total: float
+    quarterly_total: float
+    yearly_total: float
+    total_members: int
+    total_payments: int
 
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
