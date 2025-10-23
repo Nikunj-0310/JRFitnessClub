@@ -107,39 +107,48 @@ user_problem_statement: "Fitness admin app that needs total fee collection calcu
 backend:
   - task: "Create Member model and API endpoints"
     implemented: true
-    working: "needs_testing"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "needs_testing"
         agent: "main"
         comment: "Added Member model with fields (id, name, phone, membership_type, monthly_fee, joining_date). Created POST /api/members and GET /api/members endpoints."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Both POST /api/members and GET /api/members endpoints working correctly. Successfully created test members (Rahul Sharma, Priya Patel) and retrieved member list. All required fields present in responses including auto-generated UUIDs and timestamps."
 
   - task: "Create Payment model and API endpoints"
     implemented: true
-    working: "needs_testing"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "needs_testing"
         agent: "main"
         comment: "Added Payment model with fields (id, member_id, member_name, amount, payment_date, payment_type, notes). Created POST /api/payments and GET /api/payments endpoints."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Both POST /api/payments and GET /api/payments endpoints working correctly. Successfully created payments for test members with member_name auto-populated from member lookup. GET endpoint returns payments sorted by date (newest first) as expected."
 
   - task: "Create fee summary calculation endpoint"
     implemented: true
-    working: "needs_testing"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "needs_testing"
         agent: "main"
         comment: "Created GET /api/fee-summary endpoint that calculates monthly (current month), quarterly (last 3 months), and yearly (current year) fee collections. Also returns total members and total payments count."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: GET /api/fee-summary endpoint working perfectly. Initial state returns all zeros as expected. After creating 2 members and 2 payments (₹1500 + ₹2500 = ₹4000), correctly calculated monthly_total: 4000, quarterly_total: 4000, yearly_total: 4000, total_members: 2, total_payments: 2."
 
 frontend:
   - task: "Create Dashboard component with fee collection summary"
