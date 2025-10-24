@@ -109,6 +109,13 @@ class UserStatus(BaseModel):
     next_due_date: Optional[str] = None
     days_overdue: int = 0
 
+class FeeSummary(BaseModel):
+    monthly_total: float
+    quarterly_total: float
+    yearly_total: float
+    total_collections: int
+    total_active_members: int
+
 # Helper function to generate receipt image
 async def generate_receipt_image(user_name: str, amount: float, payment_type: str, payment_date: str) -> str:
     try:
