@@ -368,6 +368,66 @@ async def get_dashboard_stats(username: str = Depends(verify_credentials)):
         "recent_collections": recent_collections
     }
 
+# Fee Summary endpoint
+@api_router.get("/fee-summary", response_model=FeeSummary)
+async def get_fee_summary(username: str = Depends(verify_credentials)):
+    """Calculate monthly, quarterly, and yearly fee collection totals"""
+    now = datetime.now()
+    
+    # Calculate date ranges
+    current_month_start = datetime(now.year, now.month, 1)
+    
+    # For quarterly: last 3 months
+    if now.month <= 3:
+        quarter_start = datetime(now.year - 1, 10, 1)
+    elif now.month <= 6:
+        quarter_start = datetime(now.year, 1, 1)
+    elif now.month <= 9:
+        quarter_start = datetime(now.year, 4, 1)
+    else:
+        quarter_start = datetime(now.year, 7, 1)
+    
+    # For yearly: start of current year
+    year_start = datetime(now.year, 1, 1)
+    
+    # Get all fee collections
+    all_fees = await db.fee_collections.find({}).to_list(10000)
+    
+    # Calculate totals
+    monthly_total = 0.0
+    quarterly_total = 0.0
+    yearly_total = 0.0
+    
+    for fee in all_fees:
+        payment_date = datetime.strptime(fee['payment_date'], "%Y-%m-%d")
+        amount = fee['amount']
+        
+        # Add to yearly total
+        if payment_date >= year_start:
+            yearly_total += amount
+            
+            # Add to quarterly total
+            if payment_date >= quarter_start:
+                quarterly_total += amount
+                
+                # Add to monthly total
+                if payment_date >= current_month_start:
+                    monthly_total += amount
+    
+    # Get total collections count
+    total_collections = len(all_fees)
+    
+    # Get active members count
+    active_members = await db.users.count_documents({"status": "Active"})
+    
+    return FeeSummary(
+        monthly_total=monthly_total,
+        quarterly_total=quarterly_total,
+        yearly_total=yearly_total,
+        total_collections=total_collections,
+        total_active_members=active_members
+    )
+
 # Include the router in the main app
 app.include_router(api_router)
 
