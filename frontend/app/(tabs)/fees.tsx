@@ -248,6 +248,49 @@ export default function FeesScreen() {
         </Text>
       </View>
 
+      {/* Fee Summary Cards */}
+      <View style={styles.summaryContainer}>
+        <View style={styles.summaryRow}>
+          <View style={[styles.summaryCard, styles.summaryCardGreen]}>
+            <View style={styles.summaryIconContainer}>
+              <Ionicons name="calendar-outline" size={20} color="#27AE60" />
+            </View>
+            <Text style={styles.summaryLabel}>Monthly</Text>
+            <Text style={styles.summaryAmount}>{formatCurrency(feeSummary.monthly_total)}</Text>
+            <Text style={styles.summarySubtext}>Current month</Text>
+          </View>
+          
+          <View style={[styles.summaryCard, styles.summaryCardBlue]}>
+            <View style={styles.summaryIconContainer}>
+              <Ionicons name="stats-chart-outline" size={20} color="#4A90E2" />
+            </View>
+            <Text style={styles.summaryLabel}>Quarterly</Text>
+            <Text style={styles.summaryAmount}>{formatCurrency(feeSummary.quarterly_total)}</Text>
+            <Text style={styles.summarySubtext}>Last 3 months</Text>
+          </View>
+        </View>
+
+        <View style={styles.summaryRow}>
+          <View style={[styles.summaryCard, styles.summaryCardPurple]}>
+            <View style={styles.summaryIconContainer}>
+              <Ionicons name="trending-up-outline" size={20} color="#9B59B6" />
+            </View>
+            <Text style={styles.summaryLabel}>Yearly</Text>
+            <Text style={styles.summaryAmount}>{formatCurrency(feeSummary.yearly_total)}</Text>
+            <Text style={styles.summarySubtext}>Current year</Text>
+          </View>
+          
+          <View style={[styles.summaryCard, styles.summaryCardOrange]}>
+            <View style={styles.summaryIconContainer}>
+              <Ionicons name="people-outline" size={20} color="#E67E22" />
+            </View>
+            <Text style={styles.summaryLabel}>Active Members</Text>
+            <Text style={styles.summaryAmount}>{feeSummary.total_active_members}</Text>
+            <Text style={styles.summarySubtext}>{feeSummary.total_collections} total payments</Text>
+          </View>
+        </View>
+      </View>
+
       {/* Fee Collections List */}
       <FlatList
         data={fees}
