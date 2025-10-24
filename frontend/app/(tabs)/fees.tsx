@@ -39,9 +39,24 @@ interface User {
   phone_number: string;
 }
 
+interface FeeSummary {
+  monthly_total: number;
+  quarterly_total: number;
+  yearly_total: number;
+  total_collections: number;
+  total_active_members: number;
+}
+
 export default function FeesScreen() {
   const [fees, setFees] = useState<FeeCollection[]>([]);
   const [users, setUsers] = useState<{ [key: string]: User }>({});
+  const [feeSummary, setFeeSummary] = useState<FeeSummary>({
+    monthly_total: 0,
+    quarterly_total: 0,
+    yearly_total: 0,
+    total_collections: 0,
+    total_active_members: 0
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
