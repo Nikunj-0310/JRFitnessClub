@@ -70,17 +70,21 @@ export default function FeesScreen() {
         return;
       }
 
-      // Load fees and users in parallel
-      const [feesResponse, usersResponse] = await Promise.all([
+      // Load fees, users, and fee summary in parallel
+      const [feesResponse, usersResponse, summaryResponse] = await Promise.all([
         axios.get(`${EXPO_PUBLIC_BACKEND_URL}/api/fee-collections`, {
           headers: { 'Authorization': `Basic ${credentials}` },
         }),
         axios.get(`${EXPO_PUBLIC_BACKEND_URL}/api/users`, {
           headers: { 'Authorization': `Basic ${credentials}` },
         }),
+        axios.get(`${EXPO_PUBLIC_BACKEND_URL}/api/fee-summary`, {
+          headers: { 'Authorization': `Basic ${credentials}` },
+        }),
       ]);
 
       setFees(feesResponse.data);
+      setFeeSummary(summaryResponse.data);
       
       // Create user map for quick lookup
       const userMap: { [key: string]: User } = {};
