@@ -39,9 +39,24 @@ interface User {
   phone_number: string;
 }
 
+interface FeeSummary {
+  monthly_total: number;
+  quarterly_total: number;
+  yearly_total: number;
+  total_collections: number;
+  total_active_members: number;
+}
+
 export default function FeesScreen() {
   const [fees, setFees] = useState<FeeCollection[]>([]);
   const [users, setUsers] = useState<{ [key: string]: User }>({});
+  const [feeSummary, setFeeSummary] = useState<FeeSummary>({
+    monthly_total: 0,
+    quarterly_total: 0,
+    yearly_total: 0,
+    total_collections: 0,
+    total_active_members: 0
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<string | null>(null);
@@ -55,17 +70,22 @@ export default function FeesScreen() {
         return;
       }
 
-      // Load fees and users in parallel
-      const [feesResponse, usersResponse] = await Promise.all([
+      // Load fees, users, and fee summary in parallel
+      const [feesResponse, usersResponse, summaryResponse] = await Promise.all([
         axios.get(`${EXPO_PUBLIC_BACKEND_URL}/api/fee-collections`, {
           headers: { 'Authorization': `Basic ${credentials}` },
         }),
         axios.get(`${EXPO_PUBLIC_BACKEND_URL}/api/users`, {
           headers: { 'Authorization': `Basic ${credentials}` },
         }),
+        axios.get(`${EXPO_PUBLIC_BACKEND_URL}/api/fee-summary`, {
+          headers: { 'Authorization': `Basic ${credentials}` },
+        }),
       ]);
 
       setFees(feesResponse.data);
+      setFeeSummary(summaryResponse.data);
+      
       
       // Create user map for quick lookup
       const userMap: { [key: string]: User } = {};
@@ -228,6 +248,47 @@ export default function FeesScreen() {
           Total: {fees.length} collections
         </Text>
       </View>
+      <View style={styles.summaryContainer}>
+        <View style={styles.summaryRow}>
+          <View style={[styles.summaryCard, styles.summaryCardGreen]}>
+            <View style={styles.summaryIconContainer}>
+              <Ionicons name="calendar-outline" size={20} color="#27AE60" />
+            </View>
+            <Text style={styles.summaryLabel}>Monthly</Text>
+            <Text style={styles.summaryAmount}>{formatCurrency(feeSummary.monthly_total)}</Text>
+            <Text style={styles.summarySubtext}>Current month</Text>
+          </View>
+          
+          <View style={[styles.summaryCard, styles.summaryCardBlue]}>
+            <View style={styles.summaryIconContainer}>
+              <Ionicons name="stats-chart-outline" size={20} color="#4A90E2" />
+            </View>
+            <Text style={styles.summaryLabel}>Quarterly</Text>
+            <Text style={styles.summaryAmount}>{formatCurrency(feeSummary.quarterly_total)}</Text>
+            <Text style={styles.summarySubtext}>Last 3 months</Text>
+          </View>
+        </View>
+
+        <View style={styles.summaryRow}>
+          <View style={[styles.summaryCard, styles.summaryCardPurple]}>
+            <View style={styles.summaryIconContainer}>
+              <Ionicons name="trending-up-outline" size={20} color="#9B59B6" />
+            </View>
+            <Text style={styles.summaryLabel}>Yearly</Text>
+            <Text style={styles.summaryAmount}>{formatCurrency(feeSummary.yearly_total)}</Text>
+            <Text style={styles.summarySubtext}>Current year</Text>
+          </View>
+          
+          <View style={[styles.summaryCard, styles.summaryCardOrange]}>
+            <View style={styles.summaryIconContainer}>
+              <Ionicons name="people-outline" size={20} color="#E67E22" />
+            </View>
+            <Text style={styles.summaryLabel}>Active Members</Text>
+            <Text style={styles.summaryAmount}>{feeSummary.total_active_members}</Text>
+            <Text style={styles.summarySubtext}>{feeSummary.total_collections} total payments</Text>
+          </View>
+        </View>
+      </View>
 
       {/* Fee Collections List */}
       <FlatList
@@ -281,6 +342,57 @@ export default function FeesScreen() {
 }
 
 const styles = StyleSheet.create({
+  summaryContainer: {
+    padding: 16,
+    marginBottom: 16,
+  },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  summaryCard: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#4A90E2',
+  },
+  summaryIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#4A90E2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  summaryLabel: {
+    fontSize: 14,
+    color: '#B0B0B0',
+    marginBottom: 4,
+  },
+  summaryAmount: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 4,
+  },
+  summarySubtext: {
+    fontSize: 12,
+    color: '#B0B0B0',
+  },
+  summaryCardGreen: {
+    borderColor: '#27AE60',
+  },
+  summaryCardBlue: {
+    borderColor: '#4A90E2',
+  },
+  summaryCardPurple: {
+    borderColor: '#9B59B6',
+  },
+  summaryCardOrange: {
+    borderColor: '#E67E22',
+  },
   container: {
     flex: 1,
     backgroundColor: '#1A1A2E',
